@@ -1,10 +1,18 @@
-import { serve } from "https://deno.land/std@0.176.0/http/server.ts";
+import { serve } from "serve";
+import { Server } from "socket.io";
 
-let port = parseInt(Deno.env.get("PORT") ?? "8000");
-const s = serve({ port });
+const io = new Server({ cors: { origin: "*" } });
 
-console.log(`http://localhost:${port}/`);
+io.on("connection", (socket) => {
+  console.log(`socket ${socket.id} connected`);
 
-for await (const req of s) {
-	req.respond({ body: "Choo Choo! Welcome to your Deno app\n" });
-}
+  socket.emit("hello", "world");
+
+  socket.on("disconnect", (reason) => {
+    console.log(`socket ${socket.id} disconnected due to ${reason}`);
+  });
+});
+
+await serve(io.handler(), {
+  port: 3001,
+});
