@@ -6,10 +6,15 @@ const io = new Server({ cors: { origin: "*" } });
 io.on("connection", (socket) => {
   console.log(`socket ${socket.id} connected`);
 
-  socket.emit("hello", "world");
-
-  socket.on("disconnect", (reason) => {
-    console.log(`socket ${socket.id} disconnected due to ${reason}`);
+  socket.emit("me", socket.id);
+  socket.on("disconnect", () => {
+    socket.broadcast.emit("callEnded");
+  });
+  socket.on("callUser", ({ userToCall, signalData, from, name }) => {
+    io.to(userToCall).emit("callUser", { signal: signalData, from, name });
+  });
+  socket.on("answerCall", (data) => {
+    io.to(data.to).emit("callAccepted", data.signal);
   });
 });
 
