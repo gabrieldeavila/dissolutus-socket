@@ -16,6 +16,9 @@ io.on("connection", (socket) => {
   socket.on("answerCall", (data) => {
     io.to(data.to).emit("callAccepted", data.signal);
   });
+  socket.on("sendChunk", (data) => {
+    io.to(data.to).emit("receiveChunk", data.data);
+  });
 });
 
 await serve(io.handler(), {
