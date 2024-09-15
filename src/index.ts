@@ -19,6 +19,9 @@ io.on("connection", (socket) => {
   socket.on("sendChunk", (data) => {
     io.to(data.to).emit("receiveChunk", data.data);
   });
+  socket.on("closeConnection", (data) => {
+    io.to(data.to).emit("closeConnection");
+  });
 });
 
 await serve(io.handler(), {
